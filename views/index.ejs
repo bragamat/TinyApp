@@ -1,0 +1,8 @@
+<% include ./partials/_header.ejs %>
+	<h1><%= title %></h1>
+    <!-- Add your EJS code here -->
+    <ul><% for(var obj in urls) { %>
+    	<li><%= urls[obj] %></li>
+    	<% } %>
+    </ul>
+<% include ./partials/_footer.ejs %>
