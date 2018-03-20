@@ -46,3 +46,17 @@ app.post('/urls/new', (req, res)=>{
 app.listen(PORT, () =>{
   console.log(`${PORT} is the magic port`);
 });
+
+
+
+
+generateRandomString = () =>{
+  return Math.random().toString(36).replace(/[a-zA-Z0-9]+/g, '').substr(0, 5);
+};
+
+
+
+
+
+
+
