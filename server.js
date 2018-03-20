@@ -2,9 +2,12 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+generateRandomString = () =>{
+  return Math.random().toString(36).replace(/[a-zA-Z0-9]+/g, '').substr(0, 6);
+};
 let urlDatabase = {
   "b2xVn2": "http://lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "9sm5xK": "http://www.google.com",
 };
 
 const bodyParser = require("body-parser");
@@ -15,7 +18,7 @@ app.set('view engine', 'ejs');
 // app.get('/urls.json', (req, res) =>{
 //   res.json(urlDatabase);
 // });
-app.get("/url", (req, res) => {
+app.get("/urls", (req, res) => {
   let title = "My URL's";
   let templateVars = { 
     title: title, 
@@ -29,18 +32,23 @@ app.get('/urls/new', (req, res) =>{
   res.render('urls_new');
 });
 
+app.post('/urls/new', (req, res)=>{
+  //console.log(req.body);
+  let key = generateRandomString();
+  urlDatabase[key] = req.body.longURL;
+  res.redirect('/urls');
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+});
+
 app.get('/urls/:id', (req, res) =>{
   let templateVars = {
     shortURL: req.params.id
   };
   res.render('urls_show', templateVars);
-});
-
-
-
-app.post('/urls/new', (req, res)=>{
-  //console.log(req.body);
-  res.render('urls_new');
 });
 
 app.listen(PORT, () =>{
@@ -50,9 +58,6 @@ app.listen(PORT, () =>{
 
 
 
-generateRandomString = () =>{
-  return Math.random().toString(36).replace(/[a-zA-Z0-9]+/g, '').substr(0, 5);
-};
 
 
 
