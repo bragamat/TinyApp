@@ -9,4 +9,5 @@
 	<input type="type" name="username" placeholder="username" />
 	<input type="submit" name="submit"></form>
 <%} else {%>
-<h1><%= username %></h1> <%}%>
+<h1><%= username %></h1><form method="POST" action="/logout"><input type="submit" name="logout" value="logout">
+ <%}%>

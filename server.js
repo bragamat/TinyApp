@@ -26,16 +26,16 @@ app.get("/urls", (req, res) => {
   let templateVars = { 
     title: title, 
     urls: urlDatabase,
-    username: req.cookies.username 
+    username: req.cookies["username"] 
   };
   res.render('index', templateVars);
-  console.log(title, templateVars);
+  // console.log(title, templateVars);
 });
 
 app.get('/urls/new', (req, res) =>{
 
   let templateVars={
-    username: req.cookies.username 
+    username: req.cookies["username"] 
   } ;
 
   res.render('urls_new', templateVars);
@@ -66,7 +66,7 @@ app.get('/urls/:id', (req, res) =>{
   let templateVars = {
     shortURL: req.params.id,
     urls: urlDatabase,
-    username: req.cookies.username 
+    username: req.cookies["username"] 
   };
 
   res.render('urls_show', templateVars);
@@ -81,13 +81,17 @@ app.post('/urls/:id/update', (req, res) =>{
 
 app.post('/login', (req, res) => {
 res.cookie('username', req.body.username);
-let templateVars = {
-  username: req.cookies['username'],
-};
-  res.render("index", templateVars);
+// let templateVars = {
+//   username: req.cookies['username'],
+// };
+  // res.render("index", templateVars);
     res.redirect('/urls');
 });
 
+app.post('/logout', (req, res)=>{
+  res.clearCookie('username');
+  res.redirect('/urls');
+});
 app.listen(PORT, () =>{
   console.log(`${PORT} is the magic port`);
 });
