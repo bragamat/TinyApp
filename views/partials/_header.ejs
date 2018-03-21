@@ -4,5 +4,9 @@
 	<title>TinyApp</title>
 </head>
 <body>
-	<!-- <div><h1>Wellcome to a URL shortner</h1></div> -->
-
+<% if(!username) {%>
+<form method="POST" action="/login">
+	<input type="type" name="username" placeholder="username" />
+	<input type="submit" name="submit"></form>
+<%} else {%>
+<h1><%= username %></h1> <%}%>
