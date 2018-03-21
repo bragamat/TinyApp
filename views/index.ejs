@@ -2,7 +2,8 @@
 	<h1><%= title %></h1>
     <!-- Add your EJS code here -->
     <ul><% for(var obj in urls) { %>
-    	<li><%= urls[obj] %></li>
+    	<li><%= obj + " --> " + urls[obj] %>
+    	<form method="POST" action=<%=`/urls/${obj}/delete/`%>>	<input style="margin-left: 5px" type="submit" value="DELETE"></form></li> 
     	<% } %>
     </ul>
 <% include ./partials/_footer.ejs %>
