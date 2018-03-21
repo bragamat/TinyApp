@@ -54,9 +54,17 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.get('/urls/:id', (req, res) =>{
   let templateVars = {
-    shortURL: req.params.id
+    shortURL: req.params.id,
+    urls: urlDatabase
   };
   res.render('urls_show', templateVars);
+});
+
+app.post('/urls/:id/update', (req, res) =>{
+  let newURL = req.body.newURL;
+  console.log(newURL);
+  urlDatabase[req.params.id] = newURL;
+  res.redirect('/urls');
 });
 
 app.listen(PORT, () =>{
