@@ -38,8 +38,8 @@ app.get("/urls", (req, res) => {
   let templateVars = { 
     title: title, 
     urls: urlDatabase,
-    id:req.cookies.users_id,
-    email: req.cookies.users_email
+    id: req.cookies.user_id,
+    email: req.cookies.user_email
   };
   res.render('index', templateVars);
   // console.log(title, templateVars);
@@ -91,26 +91,17 @@ app.post('/login', (req, res) => {
    if(req.body.username == "" || req.body.password == ""){
     res.status(400).send("You need to fill the blanks with text and/or numbers");
   }
-  for (var ids in users){
-    for (var email in users[ids]){
-      if(req.body.username == users[ids].email && req.body.password == users[ids].password){
-        console.log(req.body.username,"==?", users[ids].email);
-        console.log(req.body.password,"==?", users[ids].password);
-        res.redirect('/urls');
-        continue;
-      }else {
-        console.log(req.body.username,"==?", users[ids].email);
-        res.status(403).send("email and password problems");
-      }
-    } 
-  };
-  // res.cookie('username', req.body.username);
-    res.redirect('/urls');
+  for(var ids in users){
+    if(users[ids].email === req.body.username && users[ids].password === req.body.password){
+       res.cookie('user_id', ids);
+        res.cookie('user_email', req.body.username);
+      return res.redirect('/urls');
+    }
+  }res.status(403).send("email and password problems");
 });
 
 app.post('/logout', (req, res)=>{
-  res.clearCookie('users_id');
-
+res.clearCookie('user_id');
   res.redirect('/urls');
 });
 
@@ -152,8 +143,8 @@ let id = generateRandomString();
           password: password
         };
     users[id] = person;
-    res.cookie("users_id", id);
-    res.cookie("users_email", email);
+  res.cookie("user_id", id);
+    res.cookie("user_email", email);
     console.log(users);
     }
   res.redirect('/urls');
