@@ -4,6 +4,9 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session');
+const methodOverride = require('method-override');
+
+
 function hashPassword(password){
   let hashedPassword = bcrypt.hashSync(password, 10);
     return hashedPassword;
@@ -33,7 +36,7 @@ const users = {
 };
 
 const bodyParser = require("body-parser");
-
+app.use(methodOverride('_method'));
 app.use(bodyParser.urlencoded({extended: true}));
 // app.use(cookieParser());
 app.use(cookieSession({
@@ -89,13 +92,13 @@ app.post('/urls/new', (req, res) =>{
   res.redirect('/urls');
 });
 
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id/delete', (req, res) => {
   delete urlDatabase[req.params.id];
   res.redirect('/urls');
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL].user_id;
+  let longURL = urlDatabase[req.params.shortURL].url;
   res.redirect(longURL);
 });
 
@@ -112,7 +115,7 @@ app.get('/urls/:id', (req, res) =>{
   res.render('urls_show', templateVars);
 });
 
-app.post('/urls/:id/update', (req, res) =>{
+app.put('/urls/:id/update', (req, res) =>{
   let newURL = req.body.newURL;
     urlDatabase[req.params.id].url = newURL;
     console.log(req.session.shortURL, newURL);
