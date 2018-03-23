@@ -1,7 +1,7 @@
 <% include ./partials/_header.ejs %>
 	<h1><%= title %></h1>
     <ul><% for(var obj in urls) { %>
-    	<li><%= obj + " --> " + urls[obj] %>
+    	<li><%= obj + " --> " + urls[obj].url %>
     		<form method="POST" action=<%=`/urls/${obj}/delete/`%>><a href=<%=`./urls/${obj}`%>>edit</a><input style="margin-left: 5px" type="submit" value="DELETE"></form></li> 
     	<% } %>
     </ul>
