@@ -3,7 +3,7 @@ const cookieParser = require('cookie-parser')
 const app = express();
 const PORT = process.env.PORT || 8080;
 const bcrypt = require('bcrypt');
-
+const cookieSession = require('cookie-session');
 function hashPassword(password){
   let hashedPassword = bcrypt.hashSync(password, 10);
     return hashedPassword;
@@ -35,7 +35,14 @@ const users = {
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+// app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['secret'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 
 app.set('view engine', 'ejs');
@@ -45,28 +52,30 @@ app.get("/urls", (req, res) => {
   let urls = {};
   for (let url in urlDatabase) {
     let obj = urlDatabase[url];
-    if (obj.user_id === req.cookies.user_id) {
+    if (obj.user_id === req.session.user_id) {
       urls[url] = obj;
     }
   }
+      // console.log(req.session.user_email, req.session.user_id);
+
   // console.log('urls', urls);
 
   let templateVars = { 
     title: title, 
     urls: urls,//urlDatabase[req.cookies.user_id],
-    id: req.cookies.user_id,
-    email: req.cookies.user_email
+    id: req.session.user_id,
+    email: req.session.user_email
   };
   res.render('index', templateVars);
-  console.log(title, templateVars);
+  // console.log(title, templateVars);
 });
 
 app.get('/urls/new', (req, res) =>{
   let templateVars={
-    user_id: req.cookies["user_id"], 
-    id:req.cookies.user_id,
-    email: req.cookies.user_email
-  }; if(!req.cookies["user_email"]){
+    user_id: req.session.user_id, 
+    id: req.session.user_id,
+    email: req.session.user_email
+  }; if(!req.session.user_email){
     res.redirect('/urls');
   }
 
@@ -74,8 +83,9 @@ app.get('/urls/new', (req, res) =>{
 });
 
 app.post('/urls/new', (req, res) =>{
-  urlDatabase[generateRandomString()] = { url: req.body.longURL, user_id: req.cookies.user_id };
-  res.cookie('longURL', req.body.longURL);
+  urlDatabase[generateRandomString()] = { url: req.body.longURL, user_id: req.session.user_id };
+   req.session.longURL = req.body.longURL;
+// res.cookie('longURL', req.body.longURL);
   res.redirect('/urls');
 });
 
@@ -93,10 +103,10 @@ app.get("/u/:shortURL", (req, res) => {
 app.get('/urls/:id', (req, res) =>{
   let templateVars = {
     shortURL: req.params.id,
-    urls: urlDatabase[req.cookies.user_id],
-    username: req.cookies["username"],
-    id:req.cookies.user_id,
-    email: req.cookies.user_email,
+    urls: urlDatabase[req.session.user_id],
+    username: req.session.username,
+    id:req.session.user_id,
+    email: req.session.user_email,
   };
 
   res.render('urls_show', templateVars);
@@ -105,7 +115,7 @@ app.get('/urls/:id', (req, res) =>{
 app.post('/urls/:id/update', (req, res) =>{
   let newURL = req.body.newURL;
     urlDatabase[req.params.id].url = newURL;
-    console.log(req.cookies.shortURL, newURL);
+    console.log(req.session.shortURL, newURL);
   res.redirect('/urls');
 });
 
@@ -115,15 +125,19 @@ app.post('/login', (req, res) => {
   }
   for(var ids in users){
     if(users[ids].email === req.body.username && bcrypt.compareSync(req.body.password, users[ids].password)) {
-       res.cookie('user_id', ids);
-        res.cookie('user_email', req.body.username);
+       req.session.user_id = ids;
+       // res.cookie('user_id', ids);
+       req.session.user_email = req.body.username;
+        // res.cookie('user_email', req.body.username);
       return res.redirect('/urls');
     }
   }res.status(403).send("email and password problems");
 });
 
 app.post('/logout', (req, res)=>{
-res.clearCookie('user_id');
+  req.session = null;
+// res.clearCookie('user_id');
+
   res.redirect('/urls');
 });
 
@@ -165,9 +179,11 @@ let id = generateRandomString();
           password: password
         };
     users[id] = person;
-    res.cookie("user_id", id);
-    res.cookie("user_email", email);
-    console.log(users);
+    req.session.user_id = person.id;
+    // res.cookie("user_id", id);
+    req.session.user_email = email;
+    // res.cookie("user_email", email);
+    // console.log(req.session.user_email, req.session.user_id);
     }
   res.redirect('/urls');
 }); 
