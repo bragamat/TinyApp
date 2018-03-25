@@ -52,6 +52,8 @@ app.set('view engine', 'ejs');
 
 app.get("/urls", (req, res) => {
   let title = "My URL's";
+  let id = req.session.user_id;
+  let longUr = urlDatabase;
   let urls = {};
   for (let url in urlDatabase) {
     let obj = urlDatabase[url];
@@ -64,7 +66,8 @@ app.get("/urls", (req, res) => {
   // console.log('urls', urls);
 
   let templateVars = { 
-    title: title, 
+    title: title,
+    longUr: longUr, 
     urls: urls,//urlDatabase[req.cookies.user_id],
     id: req.session.user_id,
     email: req.session.user_email
@@ -98,6 +101,7 @@ app.delete('/urls/:id/delete', (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  // console.log(urlDatabase[req.params.id]);
   let longURL = urlDatabase[req.params.shortURL].url;
   res.redirect(longURL);
 });
